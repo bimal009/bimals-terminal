@@ -1,5 +1,6 @@
 {
-  "name": "vs-port",
+  "homepage": "https://github.com/bimal009/Bimals_terminal",
+  "name": "bimals_terminal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
