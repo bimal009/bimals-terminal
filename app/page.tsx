@@ -1,188 +1,203 @@
-'use client';
-
+"use client"
 import { useState, useEffect } from 'react';
-import Header from '../components/Hero';
-import Projects from '../components/Projects';
-import Skills from '../components/Skills';
-import Contact from '../components/Contact';
-import Footer from '../components/Footer';
-import Hero from '../components/Hero';
-import Navbar from '@/components/Navbar';
+import { FileText, Settings, Search, Code, GitBranch, X, CheckCircle, Coffee, Menu, ChevronDown } from 'lucide-react';
+import Home from '@/components/Home';
+import Projects from '@/components/Projects';
+import Skills from '@/components/Skills';
+import Contact from '@/components/Contact';
 
-export default function Home() {
-  const [isRunning, setIsRunning] = useState(false);
-  const [terminalInput, setTerminalInput] = useState('');
-  const [terminalOutput, setTerminalOutput] = useState(['Welcome to Bimal\'s Portfolio Terminal']);
-  const [isLoading, setIsLoading] = useState(false);
+export default function Main() {
+  const [activeComponent, setActiveComponent] = useState('home');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const handleTerminalSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // Handle responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile); // Desktop: always open, Mobile: closed by default
+    };
 
-    // Add the command to the output
-    const newOutput = [...terminalOutput, `$ ${terminalInput}`];
-    setTerminalOutput(newOutput);
+    // Set initial state
+    handleResize();
 
-    // Process command
-    if (terminalInput.trim().toLowerCase() === 'npm run dev' ||
-      terminalInput.trim().toLowerCase() === 'yarn dev') {
+    // Add event listener
+    window.addEventListener('resize', handleResize);
 
-      setTerminalOutput([...newOutput, 'Starting development server...']);
-      setIsLoading(true);
+    // Clean up
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-      // Simulate loading with typing effect
-      setTimeout(() => {
-        setTerminalOutput([
-          ...newOutput,
-          'Starting development server...',
-          'Compiling...',
-          'Ready in 0.8s',
-          'Rendering portfolio...'
-        ]);
-
-        setTimeout(() => {
-          setIsLoading(false);
-          setIsRunning(true);
-
-          // Scroll to portfolio section
-          setTimeout(() => {
-            const portfolioElement = document.getElementById('portfolio');
-            if (portfolioElement) {
-              portfolioElement.scrollIntoView({ behavior: 'smooth' });
-            }
-          }, 100);
-        }, 800);
-      }, 500);
-    } else if (terminalInput.trim().toLowerCase() === 'clear') {
-      setTerminalOutput(['Terminal cleared']);
-    } else if (terminalInput.trim().toLowerCase() === 'help') {
-      setTerminalOutput([
-        ...newOutput,
-        'Available commands:',
-        '  npm run dev   - Start the portfolio',
-        '  yarn dev      - Alternative to npm run dev',
-        '  clear         - Clear the terminal',
-        '  help          - Show available commands'
-      ]);
-    } else if (terminalInput.trim()) {
-      setTerminalOutput([
-        ...newOutput,
-        `Command not found: ${terminalInput}`,
-        'Type "help" for available commands'
-      ]);
+  const renderActiveComponent = () => {
+    switch (activeComponent) {
+      case 'home':
+        return <Home />;
+      case 'projects':
+        return <Projects />;
+      case 'skills':
+        return <Skills />;
+      case 'contact':
+        return <Contact />;
+      default:
+        return <Home />;
     }
-
-    setTerminalInput('');
   };
 
+  const fileComponents = [
+    { name: 'home.js', component: 'home', color: 'text-blue-400' },
+    { name: 'projects.js', component: 'projects', color: 'text-yellow-400' },
+    { name: 'skills.js', component: 'skills', color: 'text-green-400' },
+    { name: 'contact.js', component: 'contact', color: 'text-orange-400' },
+    { name: 'styles.css', component: null, color: 'text-purple-400' },
+    { name: '404.js', component: null, color: 'text-red-400' },
+  ];
+
   return (
-    <main className="min-h-screen select-none">
-      {!isRunning ? (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-[#1e1e1e]">
-          <div className="theme-preview w-full max-w-4xl">
-            <div className="theme-window-controls flex items-center p-2 bg-[#252526] rounded-t-lg">
-              <div className="control control-red h-3 w-3 rounded-full bg-red-500 mr-2"></div>
-              <div className="control control-yellow h-3 w-3 rounded-full bg-yellow-500 mr-2"></div>
-              <div className="control control-green h-3 w-3 rounded-full bg-green-500 mr-2"></div>
-              <div className="ml-4 text-xs sm:text-sm text-gray-400">bimalpandey-portfolio.tsx</div>
+    <div className="min-h-screen flex flex-col bg-gray-900 text-gray-200 font-mono">
+      {/* Title Bar */}
+      <div className="bg-gray-800 px-4 py-1 flex items-center justify-between border-b border-black">
+        <div className="flex items-center">
+          <span className="text-gray-300 text-sm">Bimal&apos;s Portfolio - VS Code</span>
+        </div>
+        <div className="flex">
+          <div className="w-3 h-3 rounded-full bg-yellow-500 mx-1"></div>
+          <div className="w-3 h-3 rounded-full bg-green-500 mx-1"></div>
+          <div className="w-3 h-3 rounded-full bg-red-500 mx-1"></div>
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile Menu Button - Moved to right side, hidden when sidebar is open */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className={`md:hidden absolute top-2 right-2 z-20 p-2 bg-gray-800 rounded text-gray-300 hover:bg-gray-700 ${sidebarOpen ? 'hidden' : 'block'}`}
+          aria-label="Toggle sidebar"
+        >
+          <Menu size={20} />
+        </button>
+
+        {/* Activity Bar - Hidden on mobile */}
+        <div className="hidden md:flex w-12 bg-gray-900 flex-col items-center py-2 border-r border-gray-800">
+          <div className="p-2 text-blue-400 bg-gray-800 rounded my-1">
+            <FileText size={20} />
+          </div>
+          <div className="p-2 text-gray-500 hover:text-gray-300 my-1">
+            <Search size={20} />
+          </div>
+          <div className="p-2 text-gray-500 hover:text-gray-300 my-1">
+            <GitBranch size={20} />
+          </div>
+          <div className="p-2 text-gray-500 hover:text-gray-300 my-1">
+            <Code size={20} />
+          </div>
+          <div className="mt-auto p-2 text-gray-500 hover:text-gray-300">
+            <Settings size={20} />
+          </div>
+        </div>
+
+        {/* Explorer Sidebar - With improved mobile handling */}
+        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} 
+                        transition-transform duration-300 w-64 bg-gray-800 overflow-y-auto flex flex-col 
+                        fixed md:relative z-10 h-[calc(100vh-2rem)] md:h-auto`}>
+          <div className="p-3 text-sm uppercase tracking-wider text-gray-500 font-semibold flex justify-between items-center">
+            <div className="flex items-center">
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="hidden md:block p-1 mr-2 text-gray-400 hover:text-gray-300 hover:bg-gray-700 rounded"
+              >
+                <Menu size={16} />
+              </button>
+              <span>Explorer</span>
+            </div>
+            <button onClick={() => setSidebarOpen(false)} className="md:hidden text-gray-500 hover:text-gray-300">
+              <X size={16} />
+            </button>
+          </div>
+
+          <div className="px-2">
+            <div className="flex items-center text-gray-300 mb-1 hover:bg-gray-700 px-2 py-1 rounded">
+              <ChevronDown size={16} className="mr-1" />
+              <span>PORTFOLIO</span>
             </div>
 
-            <div className="flex flex-col md:flex-row">
-              {/* Left sidebar - file explorer */}
-              <div className="hidden md:block w-48 bg-[#252526] p-3 border-r border-[#333]">
-                <div className="text-sm text-gray-400 mb-2 font-medium">EXPLORER</div>
-                <div className="ml-2">
-                  <div className="text-gray-300 text-sm mb-1 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z" clipRule="evenodd" />
-                    </svg>
-                    portfolio
-                  </div>
-                  <div className="ml-4 text-white text-sm">
-                    <div className="flex items-center py-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M6.667 4.667L8 3.333h4l1.333 1.334v1.666H6.667V4.667zm0 3.666h8v7.334H5.333V6.667h1.334z" clipRule="evenodd" />
-                      </svg>
-                      page.tsx
-                    </div>
-                    <div className="flex items-center py-1 bg-[#37373d]">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M6.667 4.667L8 3.333h4l1.333 1.334v1.666H6.667V4.667zm0 3.666h8v7.334H5.333V6.667h1.334z" clipRule="evenodd" />
-                      </svg>
-                      bimalpandey.tsx
-                    </div>
-                    <div className="flex items-center py-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M6.667 4.667L8 3.333h4l1.333 1.334v1.666H6.667V4.667zm0 3.666h8v7.334H5.333V6.667h1.334z" clipRule="evenodd" />
-                      </svg>
-                      layout.tsx
-                    </div>
-                  </div>
+            <div className="pl-4">
+              {fileComponents.map((file) => (
+                <div
+                  key={file.name}
+                  className={`flex items-center text-gray-400 hover:bg-gray-700 px-2 py-1 rounded cursor-pointer ${activeComponent === file.component ? 'bg-gray-700' : ''}`}
+                  onClick={() => {
+                    if (file.component) {
+                      setActiveComponent(file.component);
+                      if (isMobile) {
+                        setSidebarOpen(false);
+                      }
+                    }
+                  }}
+                >
+                  <FileText size={14} className={`mr-2 ${file.color}`} />
+                  <span>{file.name}</span>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Editor - With padding to accommodate the mobile menu button */}
+        <div className="flex-1 flex flex-col bg-gray-900 md:ml-0 overflow-hidden">
+          {/* Tabs */}
+          <div className="flex bg-gray-800 text-gray-400 border-b border-gray-900 overflow-x-auto pt-2 md:pt-0">
+            {/* No left padding needed since hamburger is on the right */}
+            {fileComponents.filter(f => f.component === activeComponent).map((file) => (
+              <div key={file.name} className="px-4 py-2 bg-gray-900 text-gray-200 border-r border-gray-800 flex items-center whitespace-nowrap">
+                <FileText size={14} className={`mr-2 ${file.color}`} />
+                {file.name}
+                <X size={14} className="ml-2 hover:bg-gray-700 hover:text-gray-200 rounded" />
               </div>
+            ))}
+          </div>
 
-              {/* Right side - code editor */}
-              <div className="flex-1">
-                <div className="bg-[#1e1e1e] p-4 overflow-y-auto code-editor h-64 md:h-96">
-                  <pre className="text-sm sm:text-base">
-                    <code>
-                      <span className="code-line"><span className="theme-token-keyword">import</span> <span className="theme-token-punctuation">{'{'}</span> <span className="theme-token-variable">Portfolio</span> <span className="theme-token-punctuation">{'}'}</span> <span className="theme-token-keyword">from</span> <span className="theme-token-string">'./components'</span><span className="theme-token-punctuation">;</span></span>
-                      <span className="code-line"></span>
-                      <span className="code-line"><span className="theme-token-keyword">const</span> <span className="theme-token-function">BimalPandeyPortfolio</span> <span className="theme-token-operator">=</span> <span className="theme-token-punctuation">()</span> <span className="theme-token-operator">{"=>"}</span> <span className="theme-token-punctuation">{'{'}</span></span>
-                      <span className="code-line">  <span className="theme-token-keyword">return</span> <span className="theme-token-punctuation">(</span></span>
-                      <span className="code-line">    <span className="theme-token-punctuation">{"<"}</span><span className="theme-token-class">Portfolio</span></span>
-                      <span className="code-line">      <span className="theme-token-property">name</span><span className="theme-token-operator">=</span><span className="theme-token-string">"Bimal Pandey"</span></span>
-                      <span className="code-line">      <span className="theme-token-property">role</span><span className="theme-token-operator">=</span><span className="theme-token-string">"Full Stack Developer"</span></span>
-                      <span className="code-line">      <span className="theme-token-property">email</span><span className="theme-token-operator">=</span><span className="theme-token-string">"pandeybimal616@gmail.com"</span></span>
-                      <span className="code-line">      <span className="theme-token-property">skills</span><span className="theme-token-operator">=</span><span className="theme-token-punctuation">{'['}</span></span>
-                      <span className="code-line">        <span className="theme-token-string">"JavaScript"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"TypeScript"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"React"</span><span className="theme-token-punctuation">,</span></span>
-                      <span className="code-line">        <span className="theme-token-string">"Next.js"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"Node.js"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"Express"</span><span className="theme-token-punctuation">,</span></span>
-                      <span className="code-line">        <span className="theme-token-string">"MongoDB"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"PostgreSQL"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"Tailwind"</span></span>
-                      <span className="code-line highlight">        <span className="theme-token-comment">// ...and many more skills</span></span>
-                      <span className="code-line">      <span className="theme-token-punctuation">{']'}</span></span>
-                      <span className="code-line">    <span className="theme-token-punctuation">{"/>"}</span></span>
-                      <span className="code-line">  <span className="theme-token-punctuation">);</span></span>
-                      <span className="code-line"><span className="theme-token-punctuation">{'}'};</span></span>
-                      <span className="code-line"></span>
-                      <span className="code-line"><span className="theme-token-keyword">export</span> <span className="theme-token-keyword">default</span> <span className="theme-token-function">BimalPandeyPortfolio</span><span className="theme-token-punctuation">;</span></span>
-                    </code>
-                  </pre>
-                </div>
+          {/* Code Editor - With improved padding */}
+          <div className="flex-1 p-4 md:px-6 font-mono text-sm overflow-auto">
+            {renderActiveComponent()}
+          </div>
 
-                {/* Terminal */}
-                <div className="bg-[#1e1e1e] border-t border-[#333] p-3">
-                  <div className="text-xs sm:text-sm text-gray-400 mb-2">TERMINAL</div>
-                  <div className="bg-[#121212] p-3 rounded text-gray-200 text-sm font-mono h-40 overflow-y-auto">
-                    {terminalOutput.map((line, i) => (
-                      <div key={i} className="mb-1">{line}</div>
-                    ))}
-                    <form onSubmit={handleTerminalSubmit} className="flex items-center mt-2">
-                      <span className="text-green-400 mr-2">$</span>
-                      <input
-                        type="text"
-                        value={terminalInput}
-                        onChange={(e) => setTerminalInput(e.target.value)}
-                        className="bg-transparent focus:outline-none flex-1"
-                        placeholder={isLoading ? '' : 'Type "npm run dev" to start...'}
-                        disabled={isLoading}
-                        autoFocus
-                      />
-                    </form>
-                  </div>
-                </div>
+          {/* Terminal Panel */}
+          <div className="bg-gray-800 border-t border-gray-700">
+            <div className="flex text-sm border-b border-gray-700 overflow-x-auto">
+              <div className="px-4 py-1 text-gray-500">PROBLEMS</div>
+              <div className="px-4 py-1 bg-gray-700 text-gray-300">TERMINAL</div>
+              <div className="px-4 py-1 text-gray-500">OUTPUT</div>
+              <div className="px-4 py-1 text-gray-500">DEBUG CONSOLE</div>
+            </div>
+            <div className="p-2 text-sm">
+              <div className="flex items-center">
+                <CheckCircle size={14} className="text-green-500 mr-2" />
+                <span className="text-gray-300">Portfolio successfully compiled and ready!</span>
+              </div>
+              <div className="flex items-center mt-1">
+                <Coffee size={14} className="text-blue-400 mr-2" />
+                <span className="text-gray-400">Server running at http://localhost:3000</span>
               </div>
             </div>
           </div>
         </div>
-      ) : (
-        <div id="portfolio">
-          <Navbar />
-          <Header />
-          <Projects />
-          <Skills />
-          <Contact />
-          <Footer />
+      </div>
+
+      {/* Status Bar */}
+      <div className="bg-blue-600 text-white px-2 py-1 flex justify-between text-xs overflow-x-auto">
+        <div className="flex items-center">
+          <span className="flex items-center px-2 border-r border-blue-500">
+            <GitBranch size={12} className="mr-1" /> main
+          </span>
+          <span className="px-2">UTF-8</span>
         </div>
-      )}
-    </main>
+        <div className="flex items-center">
+          <span className="px-2">Ln 8, Col 26</span>
+          <span className="px-2 border-l border-blue-500">JavaScript</span>
+          <span className="px-2 border-l border-blue-500">Spaces: 2</span>
+        </div>
+      </div>
+    </div>
   );
 }

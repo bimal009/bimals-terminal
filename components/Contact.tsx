@@ -1,58 +1,51 @@
-'use client';
-
-import { useState, FormEvent, useRef } from 'react';
-import { Mail, Github, Twitter, Send, Loader2, Instagram } from 'lucide-react';
-import Link from 'next/link';
+"use client"
+import { useState } from 'react';
 import emailjs from '@emailjs/browser';
 
-const Contact = () => {
-    const form = useRef<HTMLFormElement>(null);
+export default function Contact() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        message: ''
+    });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<{
-        success?: boolean;
-        message?: string;
-    }>({});
+        type: 'success' | 'error' | null;
+        message: string;
+    }>({ type: null, message: '' });
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-
-        if (!form.current) return;
+        setSubmitStatus({ type: null, message: '' });
 
         try {
-            const serviceID = process.env.NEXT_PUBLIC_SERVICE_ID;
-            const templateID = process.env.NEXT_PUBLIC_TEMPLATE_ID;
-            const publicKey = process.env.NEXT_PUBLIC_EMAILJS_KEY;
+            const templateParams = {
+                from_name: formData.name,
+                from_email: formData.email,
+                message: formData.message,
+            };
 
-            if (!serviceID || !templateID || !publicKey) {
-                throw new Error('EmailJS configuration is missing');
-            }
-
-            await emailjs.sendForm(
-                serviceID,
-                templateID,
-                form.current,
-                {
-                    publicKey: publicKey,
-                }
+            const response = await emailjs.send(
+                process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+                process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+                templateParams,
+                process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
             );
 
-            setSubmitStatus({
-                success: true,
-                message: 'Message sent successfully! I will get back to you soon.'
-            });
-
-            // Reset form
-            form.current.reset();
-
-            // Clear success message after 5 seconds
-            setTimeout(() => {
-                setSubmitStatus({});
-            }, 5000);
+            if (response.status === 200) {
+                setSubmitStatus({
+                    type: 'success',
+                    message: 'Message sent successfully! I\'ll get back to you soon.'
+                });
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                throw new Error('Failed to send message');
+            }
         } catch (error: unknown) {
             console.error('Email sending failed:', error);
             setSubmitStatus({
-                success: false,
+                type: 'error',
                 message: 'Failed to send message. Please try again later.'
             });
         } finally {
@@ -60,151 +53,95 @@ const Contact = () => {
         }
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
     return (
-        <section id="contact" className="py-16 md:py-24 bg-[#252526]">
-            <div className="container mx-auto px-4">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
-                        <span className="text-sm font-mono text-gray-400">{"// Let's build something amazing together"}</span>
+        <div className="font-mono">
+            <div className="flex">
+                {/* Line numbers - Hidden on smaller screens */}
+                <div className="hidden sm:block text-gray-600 pr-4 text-right select-none w-8 shrink-0">
+                    {Array.from({ length: 15 }, (_, i) => (
+                        <div key={i} className="h-6">{i + 1}</div>
+                    ))}
+                </div>
 
-                        <h2 className="text-3xl md:text-4xl font-bold text-white mt-2">Contact Me</h2>
+                <div className="flex-1 px-2 sm:px-0">
+                    <div className="h-6 text-blue-400">import React from &apos;react&apos;;</div>
+                    <div className="h-6 text-blue-400">import emailjs from &apos;@emailjs/browser&apos;;</div>
+                    <div className="h-6"></div>
+                    <div className="h-6 text-yellow-400">function <span className="text-green-400">Contact</span>() {"{"}</div>
+                    <div className="h-6 pl-4">
+                        <span className="text-purple-400">return</span> (
                     </div>
+                    <div className="h-6 pl-8 text-gray-400">{"<div>"}</div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Contact info */}
-                        <div className="bg-[#1e1e1e] border border-[#3e3e3e] rounded-lg p-6">
-                            <div className="flex items-center mb-6">
-                                <Mail className="h-6 w-6 text-blue-400 mr-3" />
-                                <h3 className="text-xl font-semibold text-white">{"const connect = () => {"}</h3>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div>
-                                    <p className="text-sm mb-2 text-gray-400">{"// Reach out via email"}</p>
-                                    <a
-                                        href="mailto:pandeybimal616@gmail.com"
-                                        className="flex items-center text-[#9cdcfe] hover:text-white transition-colors"
-                                    >
-                                        <Mail className="h-5 w-5 mr-2" />
-                                        pandeybimal616@gmail.com
-                                    </a>
-                                </div>
-
-
-
-                                <div>
-                                    <p className="text-sm mb-2 text-gray-400">{"// Connect on social media"}</p>
-                                    <div className="flex gap-4">
-                                        <Link
-                                            href="https://github.com/bimal009"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center justify-center w-10 h-10 rounded-full bg-[#333] hover:bg-[#444] transition-colors"
-                                        >
-                                            <Github className="h-5 w-5" />
-                                        </Link>
-                                        <Link
-                                            href="https://www.instagram.com/bunchoo_graphics11"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center justify-center w-10 h-10 rounded-full bg-[#333] hover:bg-[#444] transition-colors"
-                                        >
-                                            <Instagram className="h-5 w-5" />
-                                        </Link>
-                                        <Link
-                                            href="https://x.com/CodeWithBun?t=2VYit3nsNRTPWs6nKqJpmw&s=09"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center justify-center w-10 h-10 rounded-full bg-[#333] hover:bg-[#444] transition-colors"
-                                        >
-                                            <Twitter className="h-5 w-5" />
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='mt-3'>
-                                <span className="theme-token-comment">// Have a question or need assistance with a project? Feel free to contact me! Whether you're looking for web development, app solutions, or anything in between, I'm here to help bring your ideas to life. Let's connect!</span>
-
-                            </div>
-                            <p className="text-xl font-semibold text-white mt-4">{"}"}</p>
-                        </div>
-
-                        {/* Contact form */}
-                        <div className="bg-[#1e1e1e] border border-[#3e3e3e] rounded-lg p-6">
-                            <div className="flex items-center mb-6">
-                                <Send className="h-6 w-6 text-green-400 mr-3" />
-                                <h3 className="text-xl font-semibold text-white">{"const sendMessage = async (data) => {"}</h3>
-                            </div>
-
-                            <form ref={form} onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    <label htmlFor="user_name" className="block text-sm text-gray-400 mb-2">{"// Your name"}</label>
-                                    <input
-                                        type="text"
-                                        id="user_name"
-                                        name="user_name"
-                                        placeholder="John Doe"
-                                        required
-                                        className="w-full px-4 py-2 bg-[#252526] border border-[#3e3e3e] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#0e639c] focus:border-transparent"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="user_email" className="block text-sm text-gray-400 mb-2">{"// Your email"}</label>
-                                    <input
-                                        type="email"
-                                        id="user_email"
-                                        name="user_email"
-                                        placeholder="john@example.com"
-                                        required
-                                        className="w-full px-4 py-2 bg-[#252526] border border-[#3e3e3e] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#0e639c] focus:border-transparent"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="message" className="block text-sm text-gray-400 mb-2">{"// Your message"}</label>
-                                    <textarea
-                                        id="message"
-                                        name="message"
-                                        placeholder="Your message here..."
-                                        required
-                                        rows={5}
-                                        className="w-full px-4 py-2 bg-[#252526] border border-[#3e3e3e] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#0e639c] focus:border-transparent"
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="w-full flex items-center justify-center px-6 py-3 bg-[#0e639c] text-white rounded-md hover:bg-[#0d5a8a] transition-colors disabled:opacity-50"
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="animate-spin h-5 w-5 mr-2" />
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Send className="h-5 w-5 mr-2" />
-                                            Send Message
-                                        </>
-                                    )}
-                                </button>
-
-                                {submitStatus.message && (
-                                    <div className={`p-3 rounded-md ${submitStatus.success ? 'bg-[#043a1d] text-green-300' : 'bg-[#5a1d1d] text-red-300'}`}>
-                                        {submitStatus.message}
-                                    </div>
-                                )}
-                            </form>
-                            <p className="text-xl font-semibold text-white mt-4">{"}"}</p>
-                        </div>
+                    {/* Contact Form - Improved for mobile and tablet */}
+                    <div className="h-6 pl-4 sm:pl-12 text-gray-400">{"<form>"}</div>
+                    <div className="min-h-6 h-auto pl-6 sm:pl-16 mb-2 flex flex-col sm:flex-row sm:items-center">
+                        <span className="text-blue-400 mb-1 sm:mb-0 sm:mr-2">Name: </span>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="bg-gray-800 text-white px-2 py-1 rounded w-full sm:w-auto"
+                            required
+                        />
                     </div>
+                    <div className="min-h-6 h-auto pl-6 sm:pl-16 mb-2 flex flex-col sm:flex-row sm:items-center">
+                        <span className="text-blue-400 mb-1 sm:mb-0 sm:mr-2">Email: </span>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="bg-gray-800 text-white px-2 py-1 rounded w-full sm:w-auto"
+                            required
+                        />
+                    </div>
+                    <div className="min-h-6 h-auto pl-6 sm:pl-16 mb-2 flex flex-col">
+                        <span className="text-blue-400 mb-1">Message: </span>
+                        <textarea
+                            name="message"
+                            value={formData.message}
+                            onChange={handleChange}
+                            className="bg-gray-800 text-white px-2 py-1 rounded w-full"
+                            rows={3}
+                            required
+                        />
+                    </div>
+                    <div className="min-h-6 h-auto pl-6 sm:pl-16 mb-2">
+                        <button
+                            type="submit"
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                            className={`bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                        >
+                            {isSubmitting ? 'Sending...' : 'Send Message'}
+                        </button>
+                    </div>
+                    {submitStatus.type && (
+                        <div className={`h-6 pl-16 ${submitStatus.type === 'success' ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                            <span>{submitStatus.message}</span>
+                        </div>
+                    )}
+                    <div className="h-6 pl-4 sm:pl-12 text-gray-400">{"</form>"}</div>
+
+                    <div className="h-6 pl-8 text-gray-400">{"</div>"}</div>
+                    <div className="h-6 pl-4">);</div>
+                    <div className="h-6">{"}"}</div>
+                    <div className="h-6"></div>
+                    <div className="h-6 text-yellow-400">export default Contact;</div>
                 </div>
             </div>
-        </section>
-    );
-};
-
-export default Contact;
+        </div>
+    )
+}
