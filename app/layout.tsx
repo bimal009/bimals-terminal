@@ -5,8 +5,11 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Bimal Pandey | VS Code Theme & Full Stack Developer',
-  description: 'Portfolio showcasing VS Code themes and full stack development projects by Bimal Pandey',
+  title: 'Bimal Pandey | Full Stack Developer',
+  description: 'Portfolio showcasingfull stack development projects by Bimal Pandey',
+  icons: {
+    icon: '/logo.svg',
+  },
 };
 
 export default function RootLayout({
