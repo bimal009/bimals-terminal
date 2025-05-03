@@ -1,103 +1,188 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import Header from '../components/Hero';
+import Projects from '../components/Projects';
+import Skills from '../components/Skills';
+import Contact from '../components/Contact';
+import Footer from '../components/Footer';
+import Hero from '../components/Hero';
+import Navbar from '@/components/Navbar';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isRunning, setIsRunning] = useState(false);
+  const [terminalInput, setTerminalInput] = useState('');
+  const [terminalOutput, setTerminalOutput] = useState(['Welcome to Bimal\'s Portfolio Terminal']);
+  const [isLoading, setIsLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleTerminalSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Add the command to the output
+    const newOutput = [...terminalOutput, `$ ${terminalInput}`];
+    setTerminalOutput(newOutput);
+
+    // Process command
+    if (terminalInput.trim().toLowerCase() === 'npm run dev' ||
+      terminalInput.trim().toLowerCase() === 'yarn dev') {
+
+      setTerminalOutput([...newOutput, 'Starting development server...']);
+      setIsLoading(true);
+
+      // Simulate loading with typing effect
+      setTimeout(() => {
+        setTerminalOutput([
+          ...newOutput,
+          'Starting development server...',
+          'Compiling...',
+          'Ready in 0.8s',
+          'Rendering portfolio...'
+        ]);
+
+        setTimeout(() => {
+          setIsLoading(false);
+          setIsRunning(true);
+
+          // Scroll to portfolio section
+          setTimeout(() => {
+            const portfolioElement = document.getElementById('portfolio');
+            if (portfolioElement) {
+              portfolioElement.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 100);
+        }, 800);
+      }, 500);
+    } else if (terminalInput.trim().toLowerCase() === 'clear') {
+      setTerminalOutput(['Terminal cleared']);
+    } else if (terminalInput.trim().toLowerCase() === 'help') {
+      setTerminalOutput([
+        ...newOutput,
+        'Available commands:',
+        '  npm run dev   - Start the portfolio',
+        '  yarn dev      - Alternative to npm run dev',
+        '  clear         - Clear the terminal',
+        '  help          - Show available commands'
+      ]);
+    } else if (terminalInput.trim()) {
+      setTerminalOutput([
+        ...newOutput,
+        `Command not found: ${terminalInput}`,
+        'Type "help" for available commands'
+      ]);
+    }
+
+    setTerminalInput('');
+  };
+
+  return (
+    <main className="min-h-screen select-none">
+      {!isRunning ? (
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-[#1e1e1e]">
+          <div className="theme-preview w-full max-w-4xl">
+            <div className="theme-window-controls flex items-center p-2 bg-[#252526] rounded-t-lg">
+              <div className="control control-red h-3 w-3 rounded-full bg-red-500 mr-2"></div>
+              <div className="control control-yellow h-3 w-3 rounded-full bg-yellow-500 mr-2"></div>
+              <div className="control control-green h-3 w-3 rounded-full bg-green-500 mr-2"></div>
+              <div className="ml-4 text-xs sm:text-sm text-gray-400">bimalpandey-portfolio.tsx</div>
+            </div>
+
+            <div className="flex flex-col md:flex-row">
+              {/* Left sidebar - file explorer */}
+              <div className="hidden md:block w-48 bg-[#252526] p-3 border-r border-[#333]">
+                <div className="text-sm text-gray-400 mb-2 font-medium">EXPLORER</div>
+                <div className="ml-2">
+                  <div className="text-gray-300 text-sm mb-1 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z" clipRule="evenodd" />
+                    </svg>
+                    portfolio
+                  </div>
+                  <div className="ml-4 text-white text-sm">
+                    <div className="flex items-center py-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6.667 4.667L8 3.333h4l1.333 1.334v1.666H6.667V4.667zm0 3.666h8v7.334H5.333V6.667h1.334z" clipRule="evenodd" />
+                      </svg>
+                      page.tsx
+                    </div>
+                    <div className="flex items-center py-1 bg-[#37373d]">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6.667 4.667L8 3.333h4l1.333 1.334v1.666H6.667V4.667zm0 3.666h8v7.334H5.333V6.667h1.334z" clipRule="evenodd" />
+                      </svg>
+                      bimalpandey.tsx
+                    </div>
+                    <div className="flex items-center py-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6.667 4.667L8 3.333h4l1.333 1.334v1.666H6.667V4.667zm0 3.666h8v7.334H5.333V6.667h1.334z" clipRule="evenodd" />
+                      </svg>
+                      layout.tsx
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right side - code editor */}
+              <div className="flex-1">
+                <div className="bg-[#1e1e1e] p-4 overflow-y-auto code-editor h-64 md:h-96">
+                  <pre className="text-sm sm:text-base">
+                    <code>
+                      <span className="code-line"><span className="theme-token-keyword">import</span> <span className="theme-token-punctuation">{'{'}</span> <span className="theme-token-variable">Portfolio</span> <span className="theme-token-punctuation">{'}'}</span> <span className="theme-token-keyword">from</span> <span className="theme-token-string">'./components'</span><span className="theme-token-punctuation">;</span></span>
+                      <span className="code-line"></span>
+                      <span className="code-line"><span className="theme-token-keyword">const</span> <span className="theme-token-function">BimalPandeyPortfolio</span> <span className="theme-token-operator">=</span> <span className="theme-token-punctuation">()</span> <span className="theme-token-operator">{"=>"}</span> <span className="theme-token-punctuation">{'{'}</span></span>
+                      <span className="code-line">  <span className="theme-token-keyword">return</span> <span className="theme-token-punctuation">(</span></span>
+                      <span className="code-line">    <span className="theme-token-punctuation">{"<"}</span><span className="theme-token-class">Portfolio</span></span>
+                      <span className="code-line">      <span className="theme-token-property">name</span><span className="theme-token-operator">=</span><span className="theme-token-string">"Bimal Pandey"</span></span>
+                      <span className="code-line">      <span className="theme-token-property">role</span><span className="theme-token-operator">=</span><span className="theme-token-string">"Full Stack Developer"</span></span>
+                      <span className="code-line">      <span className="theme-token-property">email</span><span className="theme-token-operator">=</span><span className="theme-token-string">"pandeybimal616@gmail.com"</span></span>
+                      <span className="code-line">      <span className="theme-token-property">skills</span><span className="theme-token-operator">=</span><span className="theme-token-punctuation">{'['}</span></span>
+                      <span className="code-line">        <span className="theme-token-string">"JavaScript"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"TypeScript"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"React"</span><span className="theme-token-punctuation">,</span></span>
+                      <span className="code-line">        <span className="theme-token-string">"Next.js"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"Node.js"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"Express"</span><span className="theme-token-punctuation">,</span></span>
+                      <span className="code-line">        <span className="theme-token-string">"MongoDB"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"PostgreSQL"</span><span className="theme-token-punctuation">,</span> <span className="theme-token-string">"Tailwind"</span></span>
+                      <span className="code-line highlight">        <span className="theme-token-comment">// ...and many more skills</span></span>
+                      <span className="code-line">      <span className="theme-token-punctuation">{']'}</span></span>
+                      <span className="code-line">    <span className="theme-token-punctuation">{"/>"}</span></span>
+                      <span className="code-line">  <span className="theme-token-punctuation">);</span></span>
+                      <span className="code-line"><span className="theme-token-punctuation">{'}'};</span></span>
+                      <span className="code-line"></span>
+                      <span className="code-line"><span className="theme-token-keyword">export</span> <span className="theme-token-keyword">default</span> <span className="theme-token-function">BimalPandeyPortfolio</span><span className="theme-token-punctuation">;</span></span>
+                    </code>
+                  </pre>
+                </div>
+
+                {/* Terminal */}
+                <div className="bg-[#1e1e1e] border-t border-[#333] p-3">
+                  <div className="text-xs sm:text-sm text-gray-400 mb-2">TERMINAL</div>
+                  <div className="bg-[#121212] p-3 rounded text-gray-200 text-sm font-mono h-40 overflow-y-auto">
+                    {terminalOutput.map((line, i) => (
+                      <div key={i} className="mb-1">{line}</div>
+                    ))}
+                    <form onSubmit={handleTerminalSubmit} className="flex items-center mt-2">
+                      <span className="text-green-400 mr-2">$</span>
+                      <input
+                        type="text"
+                        value={terminalInput}
+                        onChange={(e) => setTerminalInput(e.target.value)}
+                        className="bg-transparent focus:outline-none flex-1"
+                        placeholder={isLoading ? '' : 'Type "npm run dev" to start...'}
+                        disabled={isLoading}
+                        autoFocus
+                      />
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      ) : (
+        <div id="portfolio">
+          <Navbar />
+          <Header />
+          <Projects />
+          <Skills />
+          <Contact />
+          <Footer />
+        </div>
+      )}
+    </main>
   );
 }

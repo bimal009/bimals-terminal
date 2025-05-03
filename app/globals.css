@@ -1,26 +1,139 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground-rgb: 229, 231, 235;
+  --background-start-rgb: 30, 30, 30;
+  --background-end-rgb: 15, 15, 15;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
+
+.code-editor {
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.theme-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.theme-preview:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.7);
+}
+
+.code-line {
+  display: block;
+  white-space: pre;
+  padding: 0 0.5rem;
+}
+
+.code-line.highlight {
+  background-color: rgba(65, 105, 225, 0.2);
+  border-left: 3px solid royalblue;
+}
+
+.theme-window-controls {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: #252526;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.control-red {
+  background-color: #ff5f56;
+}
+
+.control-yellow {
+  background-color: #ffbd2e;
+}
+
+.control-green {
+  background-color: #27c93f;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+.typing-animation {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 3.5s steps(40, end);
+}
+
+.project-card {
+  transition: all 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+}
+
+.tech-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: #2d2d2d;
+  color: #d4d4d4;
+  border: 1px solid #3e3e3e;
+}
+
+.sidebar {
+  background-color: #252526;
+  border-right: 1px solid #1e1e1e;
+}
+
+.glow {
+  text-shadow: 0 0 10px rgba(79, 70, 229, 0.7);
+}
+
+.vscode-button {
+  background-color: #0e639c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 2px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.vscode-button:hover {
+  background-color: #1177bb;
+}
+
+/* VS Code Theme Colors */
+.theme-token-keyword { color: #569cd6; }
+.theme-token-string { color: #ce9178; }
+.theme-token-comment { color: #6a9955; }
+.theme-token-function { color: #dcdcaa; }
+.theme-token-variable { color: #9cdcfe; }
+.theme-token-number { color: #b5cea8; }
+.theme-token-class { color: #4ec9b0; }
+.theme-token-property { color: #9cdcfe; }
+.theme-token-operator { color: #d4d4d4; }
+.theme-token-punctuation { color: #d4d4d4; }
